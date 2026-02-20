@@ -9,9 +9,9 @@ function Home() {
 
       <section className="relative w-full h-[500px] overflow-hidden">
         <img 
-          src="/hero-lab-image.jpg" 
+          src="/images/livlab.jpg" 
           alt="Lab Work" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-[center_32%]"
         />
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
           <h1 className="text-white text-6xl font-light tracking-tight">
