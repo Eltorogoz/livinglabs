@@ -1,26 +1,12 @@
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
 
 function Documents() {
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
       
       
-      <header className="flex items-center justify-between px-8 py-4 border-b">
-        <div className="flex items-center gap-4">
-          <img src="/images/PurdueLogo.svg" alt="Purdue University" className="h-12" />
-          <span className="text-lg font-medium">Living Lab Purdue University</span>
-        </div>
-
-        <nav className="hidden md:flex gap-8 text-sm font-semibold">
-          <Link to="/" className="hover:text-yellow-600">Home</Link>
-          <Link to="/documents" className="hover:text-yellow-600">Documents</Link>
-          <Link to="/projects" className="hover:text-yellow-600">Projects</Link>
-          <Link to="/faq" className="hover:text-yellow-600">FAQ</Link>
-          <Link to="/help" className="hover:text-yellow-600">Help</Link>
-        </nav>
-
-        <div className="w-6 h-6">🔍</div>
-      </header>
+   <Header />
 
   
       <section className="text-center py-14">
