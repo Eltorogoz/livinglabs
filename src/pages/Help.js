@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
 
 function Help() {
-  // Slideshow State
+  
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
@@ -18,50 +19,34 @@ function Help() {
     },
     {
       id: 3,
-      src: "https://www.purdue.edu/polytechnic/livlab/wp-content/uploads/2023/10/2023_KAL_0156.jpg",
+      src: "https://www.purdue.edu/home/wp-content/uploads/2024/04/About-ExploreWL-PMU-1920x960-1.jpg",
       alt: "Living lab presentation",
     }
   ];
 
-  // Auto-play functionality
+ 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 5000); // Changes slide every 5 seconds
+    }, 5000); 
 
-    return () => clearInterval(timer); // Cleanup on unmount
+    return () => clearInterval(timer); 
   }, [slides.length]);
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 flex flex-col">
       
-      {/* Header (Kept Identical to Documents.js) */}
-      <header className="flex items-center justify-between px-8 py-4 border-b">
-        <div className="flex items-center gap-4">
-          <img src="/images/PurdueLogo.svg" alt="Purdue University" className="h-12" />
-          <span className="text-lg font-medium">Living Lab Purdue University</span>
-        </div>
+     <Header />
 
-        <nav className="hidden md:flex gap-8 text-sm font-semibold">
-          <Link to="/" className="hover:text-yellow-600">Home</Link>
-          <Link to="/documents" className="hover:text-yellow-600">Documents</Link>
-          <Link to="/projects" className="hover:text-yellow-600">Projects</Link>
-          <Link to="/faq" className="hover:text-yellow-600">FAQ</Link>
-          <Link to="/help" className="hover:text-yellow-600">Help</Link>
-        </nav>
-
-        <div className="w-6 h-6">🔍</div>
-      </header>
-
-      {/* Page Title */}
+     
       <section className="text-center py-10">
         <h1 className="text-4xl font-medium">Help & Enrollment</h1>
       </section>
 
-      {/* Main Content Area */}
+      
       <main className="max-w-6xl mx-auto px-6 pb-20 flex flex-col items-center flex-grow w-full">
         
-        {/* === SLIDESHOW SECTION === */}
+        
         <div className="relative w-full max-w-4xl h-64 md:h-96 mb-12 rounded-xl overflow-hidden shadow-lg bg-gray-100 group">
           {slides.map((slide, index) => (
             <div
