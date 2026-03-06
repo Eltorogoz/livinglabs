@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 function Help() {
   
@@ -60,12 +61,12 @@ function Help() {
                 alt={slide.alt}
                 className="w-full h-full object-cover"
               />
-              {/* Optional Dark Overlay for better contrast */}
+              
               <div className="absolute inset-0 bg-black bg-opacity-10"></div>
             </div>
           ))}
 
-          {/* Navigation Dots */}
+         
           <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
             {slides.map((_, index) => (
               <button
@@ -73,7 +74,7 @@ function Help() {
                 onClick={() => setCurrentSlide(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentSlide
-                    ? "bg-[#DAAA00] w-6" // Active dot gets wider and gold
+                    ? "bg-[#DAAA00] w-6" 
                     : "bg-white opacity-70 hover:opacity-100"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -81,10 +82,10 @@ function Help() {
             ))}
           </div>
         </div>
-        {/* === END SLIDESHOW SECTION === */}
+       
 
         
-        {/* Informational Text */}
+     
         <div className="max-w-3xl text-left mb-14 space-y-5 text-gray-800 leading-relaxed">
           <h2 className="text-2xl font-bold text-black">Need to fulfill your RISE requirement for graduation?</h2>
           <p>
@@ -98,7 +99,7 @@ function Help() {
           </p>
         </div>
 
-        {/* Tailwind-Converted Student Form */}
+       
         <div className="w-full max-w-2xl bg-white p-8 md:p-10 border-2 border-[#B28F4A] shadow-sm rounded-md mb-10">
           <h2 className="text-2xl font-bold mb-6 text-black border-b pb-4">Student Information Form</h2>
           
@@ -158,10 +159,8 @@ function Help() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center py-10 text-sm text-gray-600 border-t mt-auto">
-        <p>© {new Date().getFullYear()} Purdue University. All Rights Reserved.</p>
-      </footer>
+     
+     <Footer />
 
     </div>
   );

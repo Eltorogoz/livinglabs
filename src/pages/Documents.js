@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 function Documents() {
   return (
@@ -58,8 +59,8 @@ function Documents() {
           ))}
         </div>
       </main>   
-      <footer className="text-center py-10 text-sm text-gray-600">
-      </footer>
+      
+      <Footer />
 
     </div>
   );

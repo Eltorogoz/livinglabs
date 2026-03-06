@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 
 function Home() {
@@ -41,6 +42,8 @@ function Home() {
           ))}
         </div>
       </main>
+
+      <Footer />
 
     </div>
   );
