@@ -20,12 +20,21 @@ function Header() {
           <Link to="/help" className="hover:text-yellow-600">Help</Link>
         </nav>
 
-        <button
-          onClick={() => setShowSearch(!showSearch)}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
-        >
-          🔍
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+          >
+            🔍
+          </button>
+          
+          <Link 
+            to="/login" 
+            className="bg-[#C4B07A] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-700 transition"
+          >
+            Log In
+          </Link>
+        </div>
       </header>
 
       {showSearch && (
