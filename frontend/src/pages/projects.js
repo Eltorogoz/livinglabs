@@ -1,9 +1,8 @@
-import { Link } from "react-router-dom";
+import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-
 function Projects() {
-  const Projects = [
+  const projects = [
     {
       name: "TEMP",
       description: "...",
@@ -31,19 +30,16 @@ function Projects() {
 
       <Header />
 
-     
       <div className="text-center py-10">
         <h1 className="text-3xl font-semibold">Projects</h1>
       </div>
 
-    
       <main className="max-w-6xl mx-auto px-6 pb-16 flex-grow">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-12 gap-x-24">
 
-          {Projects.map((project, index) => (
+          {projects.map((project, index) => (
             <div key={index} className="contents">
 
-             
               <div className="bg-gray-100 aspect-[2/1] p-6 flex flex-col justify-center">
                 <h2 className="text-xl font-semibold mb-2">
                   {project.name}
@@ -72,5 +68,4 @@ function Projects() {
     </div>
   );
 }
-
 export default Projects;

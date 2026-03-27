@@ -18,6 +18,7 @@ function Header() {
           <Link to="/projects" className="hover:text-yellow-600">Projects</Link>
           <Link to="/faq" className="hover:text-yellow-600">FAQ</Link>
           <Link to="/help" className="hover:text-yellow-600">Help</Link>
+        
         </nav>
 
         <div className="flex items-center gap-4">
