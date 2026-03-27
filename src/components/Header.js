@@ -15,7 +15,7 @@ function Header() {
         <nav className="hidden md:flex gap-8 text-sm font-semibold">
           <Link to="/" className="hover:text-yellow-600">Home</Link>
           <Link to="/documents" className="hover:text-yellow-600">Documents</Link>
-          <Link to="/projects" className="hover:text-yellow-600">Projects</Link>
+           <Link to="/projects" className="hover:text-yellow-600">Projects</Link>
           <Link to="/faq" className="hover:text-yellow-600">FAQ</Link>
           <Link to="/help" className="hover:text-yellow-600">Help</Link>
         </nav>
