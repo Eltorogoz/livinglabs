@@ -8,9 +8,22 @@ function Header() {
     <>
       <header className="flex items-center justify-between px-8 py-4 border-b">
         <div className="flex items-center gap-4">
-          <img src="/images/PurdueLogo.svg" alt="Purdue University" className="h-12" />    
-          <span className="text-lg font-medium">Living Lab Purdue University</span>
-        </div>
+  
+  {/* Clickable logo */}
+  <Link to="/">
+    <img 
+      src="/images/PurdueLogo.svg" 
+      alt="Purdue University" 
+      className="h-12 hover:opacity-80 transition cursor-pointer"
+    />
+  </Link>
+
+  {/* Text NOT clickable */}
+  <span className="text-lg font-medium">
+    Living Lab Purdue University
+  </span>
+
+</div>
 
         <nav className="hidden md:flex gap-8 text-sm font-semibold">
           <Link to="/" className="hover:text-yellow-600">Home</Link>
