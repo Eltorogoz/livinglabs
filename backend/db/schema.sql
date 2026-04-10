@@ -14,9 +14,8 @@ CREATE TABLE IF NOT EXISTS Users (
 -- Project Table
 CREATE TABLE IF NOT EXISTS Projects (
     projectID     INT AUTO_INCREMENT,
-    title         VARCHAR(255) NOT NULL,
+    group_name    VARCHAR(255) NOT NULL,
     description   VARCHAR(355),
-    group_name    VARCHAR(255),
     date_created  DATE,
     PRIMARY KEY (projectID)
 );

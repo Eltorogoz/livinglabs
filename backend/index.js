@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
+// temp disabling the login stuff... its not working well as of now
 // const authRoutes = require('./login');
 // app.use('/api/auth', authRoutes);
 
@@ -163,16 +163,16 @@ app.post('/api/users', async (req, res) => {
 // POST project (create new project)
 app.post('/api/projects', async (req, res) => {
     try {
-        const { title, description, group_name, date_created } = req.body;
+        const { group_name, description, date_created } = req.body;
 
-        if (!title) {
+        if (!group_name) {
             return res.status(400).json({
-            error: 'Project title is required'
+            error: 'Project group name is required'
             });
         }
         const [result] = await db.query(
-            'INSERT INTO Projects (title, description, group_name, date_created) VALUES (?, ?, ?, ?)',
-            [title, description || null, group_name || null, date_created || null]
+            'INSERT INTO Projects (group_name, description, date_created) VALUES (?, ?, ?, ?)',
+            [group_name, description || null, date_created || null]
         );
         res.status(201).json({
             message: 'Project created successfully',
