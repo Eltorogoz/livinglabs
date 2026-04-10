@@ -51,4 +51,8 @@ function Header() {
   );
 }
 
+<<<<<<< HEAD
 export default Header;
+=======
+export default Header;
+>>>>>>> 41e8543 (updated project code)

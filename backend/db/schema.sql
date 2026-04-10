@@ -34,3 +34,15 @@ CREATE TABLE IF NOT EXISTS Documents (
     FOREIGN KEY (projectID) REFERENCES Projects(projectID) ON DELETE CASCADE
 );
 
+<<<<<<< HEAD
+=======
+-- Form 
+CREATE TABLE IF NOT EXISTS Form (
+    formID INT AUTO_INCREMENT PRIMARY KEY,
+    formName VARCHAR(220) NOT NULL,
+    formEmail VARCHAR(200) NOT NULL,
+    formPhone VARCHAR(20),
+    formMessage TEXT,
+    date_uploaded TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+>>>>>>> 41e8543 (updated project code)

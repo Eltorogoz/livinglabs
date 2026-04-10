@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Help() {
+<<<<<<< HEAD
   
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -59,26 +60,94 @@ function Help() {
                 className="w-full h-full object-cover"
               />
               
+=======
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const BACKEND_URL = "http://localhost:3001";
+  const slides = [
+    { id: 1, src: "https://www.purdue.edu/polytechnic/livlab/wp-content/uploads/2024/10/Britney-Ho_JU17051.jpg", alt: "Student working at desk" },
+    { id: 2, src: "https://www.purdue.edu/polytechnic/livlab/wp-content/uploads/2024/10/2024_GMB5751.jpg", alt: "Students collaborating" },
+    { id: 3, src: "https://www.purdue.edu/home/wp-content/uploads/2024/04/About-ExploreWL-PMU-1920x960-1.jpg", alt: "Living lab presentation" }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      message: formData.get("message")
+    };
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error("Network error");
+
+      const result = await response.json();
+      alert("Form submitted successfully!");
+      console.log(result);
+      e.target.reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Failed to submit form. Is the backend running?");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white font-sans text-gray-900">
+      <Header />
+      <section className="text-center py-10">
+        <h1 className="text-4xl font-medium">Help & Enrollment</h1>
+      </section>
+
+      <main className="max-w-6xl mx-auto px-6 pb-20 flex flex-col items-center flex-grow w-full">
+        {/* Slider */}
+        <div className="relative w-full max-w-4xl h-64 md:h-96 mb-12 rounded-xl overflow-hidden shadow-lg bg-gray-100 group">
+          {slides.map((slide, index) => (
+            <div key={slide.id} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"}`}>
+              <img src={slide.src} alt={slide.alt} className="w-full h-full object-cover" />
+>>>>>>> 41e8543 (updated project code)
               <div className="absolute inset-0 bg-black bg-opacity-10"></div>
             </div>
           ))}
 
+<<<<<<< HEAD
          
+=======
+>>>>>>> 41e8543 (updated project code)
           <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
+<<<<<<< HEAD
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentSlide
                     ? "bg-[#DAAA00] w-6" 
                     : "bg-white opacity-70 hover:opacity-100"
                 }`}
+=======
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-[#DAAA00] w-6" : "bg-white opacity-70 hover:opacity-100"}`}
+>>>>>>> 41e8543 (updated project code)
                 aria-label={`Go to slide ${index + 1}`}
               ></button>
             ))}
           </div>
         </div>
+<<<<<<< HEAD
        
 
         
@@ -149,16 +218,62 @@ function Help() {
                 type="submit" 
                 className="bg-[#B28F4A] text-black px-8 py-3 rounded-lg font-bold cursor-pointer hover:bg-black hover:text-[#B28F4A] transition-colors duration-300 w-full sm:w-auto shadow-md"
               >
+=======
+
+        {/* Info */}
+        <div className="max-w-3xl text-left mb-14 space-y-5 text-gray-800 leading-relaxed">
+          <h2 className="text-2xl font-bold text-black">Need to fulfill your RISE requirement for graduation?</h2>
+          <p>
+            The Living Lab at Purdue University Indianapolis provides RISE eligible projects, internship, and service learning opportunities. Whether your major is Networking, Security, Web Development, OLS, or Computer Graphics Technology, the Living Lab at Purdue University Indianapolis provides you the opportunity to fulfill RISE requirements while developing resume-worthy experience. Check out the projects by type from the <Link to="/" className="text-[#DAAA00] hover:underline font-medium">Home Page</Link>.
+          </p>
+          <p>
+            Class meetings are from 9 AM to 5 PM on Fridays each week... <strong>REQUIRED</strong>.
+          </p>
+          <p>If you would like to learn more, fill out the contact form below.</p>
+        </div>
+
+        {/* Form */}
+        <div className="w-full max-w-2xl bg-white p-8 md:p-10 border-2 border-[#B28F4A] shadow-sm rounded-md mb-10">
+          <h2 className="text-2xl font-bold mb-6 text-black border-b pb-4">Student Information Form</h2>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="name" className="block font-bold text-black mb-2">First and Last Name</label>
+              <input type="text" id="name" name="name" required className="w-full p-3 border border-black rounded-lg bg-gray-50 text-base outline-none focus:ring-2 focus:ring-[#B28F4A] transition" />
+            </div>
+            <div>
+              <label htmlFor="email" className="block font-bold text-black mb-2">Email Address</label>
+              <input type="email" id="email" name="email" required className="w-full p-3 border border-black rounded-lg bg-gray-50 text-base outline-none focus:ring-2 focus:ring-[#B28F4A] transition" />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block font-bold text-black mb-2">Phone Number</label>
+              <input type="tel" id="phone" name="phone" required className="w-full p-3 border border-black rounded-lg bg-gray-50 text-base outline-none focus:ring-2 focus:ring-[#B28F4A] transition" />
+            </div>
+            <div>
+              <label htmlFor="message" className="block font-bold text-black mb-2">Message</label>
+              <textarea id="message" name="message" rows="5" className="w-full p-3 border border-black rounded-lg bg-gray-50 text-base outline-none focus:ring-2 focus:ring-[#B28F4A] transition resize-y"></textarea>
+            </div>
+            <div className="text-center sm:text-left">
+              <button type="submit" className="bg-[#B28F4A] text-black px-8 py-3 rounded-lg font-bold cursor-pointer hover:bg-black hover:text-[#B28F4A] transition-colors duration-300 w-full sm:w-auto shadow-md">
+>>>>>>> 41e8543 (updated project code)
                 Submit Request
               </button>
             </div>
           </form>
         </div>
       </main>
+<<<<<<< HEAD
       
      <Footer />
+=======
+
+      <Footer />
+>>>>>>> 41e8543 (updated project code)
     </div>
   );
 }
 
+<<<<<<< HEAD
 export default Help;
+=======
+export default Help;
+>>>>>>> 41e8543 (updated project code)
