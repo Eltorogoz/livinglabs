@@ -5,6 +5,9 @@ import Projects from "./pages/ProjectsPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import Faq from "./pages/FAQ";
 import Help from "./pages/Help";
+import Login from "./pages/login";
+import Projects from "./pages/Projects";
+import Signup from "./pages/Signup";
 
 
 function App() {
@@ -16,6 +19,9 @@ function App() {
       <Route path="/projects/:id" element={<ProjectDetails />} />
       <Route path="/faq" element={<Faq />} /> 
       <Route path="/help" element={<Help />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/projects" element={<Projects />} />
+        <Route path="/signup" element={<Signup />} />
     </Routes>
   );
 }

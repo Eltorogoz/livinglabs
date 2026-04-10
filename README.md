@@ -1,70 +1,197 @@
-# Getting Started with Create React App
+# Living Lab - Purdue University
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<p align="center">
+  <img src="frontend/public/images/PurdueLogo.svg" alt="Purdue Logo" width="200"/>
+</p>
 
-## Available Scripts
+A web application for the **Purdue University Living Lab** initiative, enabling students to discover RISE-eligible projects, manage documents, and enroll in experiential learning opportunities.
 
-In the project directory, you can run:
+## About
 
-### `npm start`
+The Living Lab at Purdue University Indianapolis provides RISE (Research, Internship, Service-learning, and Experiential) eligible projects, internships, and service learning opportunities. This platform allows students to:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Browse approved projects
+- Access project documents
+- Submit enrollment requests
+- Authenticate with their credentials
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19, React Router 7, Tailwind CSS 3 |
+| Backend | Node.js, Express 5 |
+| Database | MySQL |
+| Authentication | bcrypt, express-session |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Project Structure
 
-### `npm run build`
+```
+livinglabs/
+├── frontend/                 # React frontend application
+│   ├── public/
+│   │   └── images/          # Static assets (logos, images)
+│   ├── src/
+│   │   ├── components/      # Reusable UI components (Header, Footer)
+│   │   ├── pages/           # Page components
+│   │   ├── App.js           # Main app with routing
+│   │   └── index.js         # Entry point
+│   └── package.json
+│
+├── backend/                  # Express API server
+│   ├── db/
+│   │   └── schema.sql       # Database schema
+│   ├── uploads/             # Uploaded document files
+│   ├── db.js                # MySQL connection pool
+│   ├── index.js             # API routes
+│   └── package.json
+│
+└── README.md
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Node.js** (v18 or higher)
+- **npm** (v9 or higher)
+- **MySQL** (v8.0 or higher)
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Eltorogoz/livinglabs.git
+   cd livinglabs
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Set up the database**
+   ```bash
+   mysql -u root -p < backend/db/schema.sql
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. **Configure environment variables**
+   
+   Create a `.env` file in the `backend/` directory:
+   ```env
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASS=your_mysql_password
+   DB_NAME=kbtest_db
+   SESSION_SECRET=your_secret_key
+   PORT=3001
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. **Install dependencies**
+   ```bash
+   # Backend
+   cd backend
+   npm install
 
-## Learn More
+   # Frontend
+   cd ../frontend
+   npm install
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Running the Application
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Start the backend server:**
+```bash
+cd backend
+npm start
+```
 
-### Code Splitting
+**Start the frontend (in a new terminal):**
+```bash
+cd frontend
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The application will be available at:
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:3001
 
-### Analyzing the Bundle Size
+## API Endpoints
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | User login |
+| POST | `/logout` | User logout |
+| GET | `/api/me` | Get current user session |
 
-### Making a Progressive Web App
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/users` | Get all users |
+| POST | `/api/users` | Create new user |
+| DELETE | `/api/users/:id` | Delete user (admin) |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Projects
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/projects` | Get all projects |
+| GET | `/api/projects/:id` | Get project by ID |
+| GET | `/api/projects/:id/documents` | Get project documents |
+| POST | `/api/projects` | Create project (admin) |
+| DELETE | `/api/projects/:id` | Delete project (admin) |
 
-### Advanced Configuration
+### Documents
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/documents` | Get all documents |
+| GET | `/api/documents/:id` | Get document by ID |
+| POST | `/api/documents` | Create document (admin) |
+| DELETE | `/api/documents/:id` | Delete document (admin) |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Contact Form
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/submit` | Submit enrollment form |
 
-### Deployment
+## Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- **Project Browsing** - View approved Living Lab projects
+- **Document Management** - Search and access project documents
+- **User Authentication** - Secure login with hashed passwords
+- **RISE Enrollment** - Submit enrollment requests for RISE credit
+- **Admin Controls** - Project and document management for administrators
+- **Responsive Design** - Mobile-friendly UI with Tailwind CSS
 
-### `npm run build` fails to minify
+## Screenshots
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Home Page | Projects | Help & Enrollment |
+|-----------|----------|-------------------|
+| Hero section with Living Lab branding | Browse current projects | RISE info and contact form |
+
+## Database Schema
+
+The application uses MySQL with the following tables:
+
+- **Users** - User accounts with roles (user/admin)
+- **Projects** - Project information
+- **Documents** - Project documents with file paths
+- **Form** - Contact form submissions
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Team
+
+Purdue University Indianapolis - Living Lab Team
+
+## License
+
+This project is developed for Purdue University Living Lab.
+
+---
+
+<p align="center">
+  <strong>Purdue University Indianapolis</strong><br>
+  Living Lab Initiative
+</p>
