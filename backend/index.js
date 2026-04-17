@@ -319,8 +319,13 @@ app.delete('/api/projects/:id', async (req, res) => {
     res.json({ message: 'Project deleted successfully' });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Database error' });
+       console.error("SIGNUP ERROR:", err);
+
+res.status(500).json({
+    error: err.message,
+    code: err.code,
+    sqlMessage: err.sqlMessage
+});
     }
 });
 

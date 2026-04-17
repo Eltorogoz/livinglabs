@@ -38,6 +38,7 @@ function Login() {
           navigate("/admin");
         } else {
           localStorage.removeItem("isAdmin");
+          localStorage.removeItem("user");
           setError("This account is not an Admin.");
         }
       } else {
@@ -57,17 +58,10 @@ function Login() {
 
       <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-
           <h2 className="text-3xl font-bold text-center mb-2">Sign In</h2>
           <p className="text-center text-gray-600 mb-6">
             Access Living Lab Purdue University
           </p>
-
-          {error && (
-            <div className="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
-              {error}
-            </div>
-          )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Username */}
@@ -93,7 +87,7 @@ function Login() {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password or BoilerKey
+                Password
               </label>
               <div className="mt-1">
                 <input
@@ -109,10 +103,17 @@ function Login() {
               </div>
             </div>
 
+            {/* Error */}
+            {error && (
+              <div className="p-3 bg-red-100 text-red-700 text-sm rounded">
+                {error}
+              </div>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-[#C4B07A] text-white py-2 rounded hover:bg-yellow-700"
+              className="w-full bg-[#C4B07A] text-white py-2 rounded hover:bg-yellow-700 transition"
             >
               Sign In
             </button>
@@ -121,7 +122,7 @@ function Login() {
             <Link to="/signup">
               <button
                 type="button"
-                className="w-full border border-[#C4B07A] text-[#C4B07A] py-2 rounded mt-2 hover:bg-[#C4B07A] hover:text-white"
+                className="w-full border border-[#C4B07A] text-[#C4B07A] py-2 rounded hover:bg-[#C4B07A] hover:text-white transition"
               >
                 Create Account
               </button>
