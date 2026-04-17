@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import AdminRoute from "./components/AdminRoute.js";
 
 
+
 function App() {
   return (
     <Routes>
@@ -23,7 +24,6 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/admin" element={<AdminRoute> <AdminPanel /> </AdminRoute>}/>
-
     </Routes>
   );
 }
