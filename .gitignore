@@ -1,8 +1,5 @@
 node_modules/
-<<<<<<< HEAD
-=======
 .env
 backend/node_modules/
 frontend/node_modules/
 uploads/
->>>>>>> 41e8543 (updated project code)
