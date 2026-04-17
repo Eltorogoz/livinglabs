@@ -167,18 +167,25 @@ app.post('/api/projects', async (req, res) => {
 
         if (!group_name) {
             return res.status(400).json({
-            error: 'Project group name is required'
+                error: 'Project group name is required'
             });
         }
+
+        if (date_created) {
+            date_created = String(date_created).split('T')[0];
+        } else {
+            date_created = null;
+        }
+
         const [result] = await db.query(
             'INSERT INTO Projects (group_name, description, date_created) VALUES (?, ?, ?)',
             [group_name, description || null, date_created || null]
         );
+
         res.status(201).json({
             message: 'Project created successfully',
             projectID: result.insertId
         });
-
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });
@@ -209,6 +216,66 @@ app.post('/api/documents', async (req, res) => {
             documentID: result.insertId
         });
 
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// UPDATE a project
+app.put('/api/projects/:id', async (req, res) => {
+    try {
+        const projectID = req.params.id;
+        let { group_name, description, date_created } = req.body;
+
+        if (!group_name) {
+            return res.status(400).json({ error: 'Project name is required' });
+        }
+
+        if (date_created) {
+            date_created = String(date_created).split('T')[0];
+        } else {
+            date_created = null;
+        }
+
+        const [result] = await db.query(
+            'UPDATE Projects SET group_name = ?, description = ?, date_created = ? WHERE projectID = ?',
+            [group_name, description || null, date_created, projectID]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        res.json({ message: 'Project updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message || 'Database error' });
+    }
+});
+
+//UPDATE a document
+app.put('/api/documents/:id', async (req, res) => {
+    try {
+        const documentID = req.params.id;
+        const { projectID, title, file_path, created_at } = req.body;
+
+        if (!projectID || !title || !file_path) {
+            return res.status(400).json({
+                error: 'projectID, title, and file_path are required'
+            });
+        }
+
+        const [result] = await db.query(
+            'UPDATE Documents SET projectID = ?, title = ?, file_path = ?, created_at = ? WHERE documentID = ?',
+            [projectID, title, file_path, created_at || null, documentID]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Document not found' });
+        }
+
+        res.json({ message: 'Document updated successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });

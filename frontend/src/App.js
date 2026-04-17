@@ -8,6 +8,10 @@ import Help from "./pages/Help";
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
 import AdminPanel from "./pages/AdminPanel";
+import AdminRoute from "./components/AdminRoute.js";
+
+
+
 
 function App() {
   return (
@@ -21,6 +25,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/admin" element={<AdminRoute> <AdminPanel /> </AdminRoute>}/>
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<AdminPanel />} />
     </Routes>

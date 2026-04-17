@@ -6,11 +6,27 @@ import { Link, useNavigate } from "react-router-dom";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+<<<<<<< HEAD
+  const [error, setError] = useState("");
+
+=======
+>>>>>>> 5b74d2d0c692a4bf02b3f692dad7ac1291204c1d
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+<<<<<<< HEAD
+    if (username === "admin" && password === "admin123") {
+      localStorage.setItem("isAdmin", "true");
+      navigate("/admin");
+    } else {
+      setError("Invalid admin login.")
+    }
+
+    // Add your authentication logic here
+    console.log("Logging in with:", username, password);
+=======
     try {
       const response = await fetch("http://localhost:3001/api/login", {
         method: "POST",
@@ -44,6 +60,7 @@ function Login() {
       console.error("Network error:", err);
       alert("Server not reachable");
     }
+>>>>>>> 5b74d2d0c692a4bf02b3f692dad7ac1291204c1d
   };
 
   return (
@@ -58,10 +75,34 @@ function Login() {
             Access Living Lab Purdue University
           </p>
 
+          {error && (
+            <div className="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
 
             {/* Username */}
             <div>
+<<<<<<< HEAD
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Purdue Career Account Alias
+              </label>
+
+              <div className="mt-1">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#C4B07A] focus:border-[#C4B07A] sm:text-sm"
+                  placeholder="username"
+                />
+              </div>
+=======
               <label className="block text-sm font-medium">Username</label>
               <input
                 type="text"
@@ -70,6 +111,7 @@ function Login() {
                 className="w-full border p-2 rounded"
                 required
               />
+>>>>>>> 5b74d2d0c692a4bf02b3f692dad7ac1291204c1d
             </div>
 
             {/* Password */}
@@ -102,10 +144,36 @@ function Login() {
               </button>
             </Link>
 
+<<<<<<< HEAD
+              {/* Submit Button */}
+            <div className="space-y-3">
+              {/* Sign In Button */}
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-[#C4B07A] hover:bg-yellow-700 transition"
+              >
+                Sign in
+              </button>
+
+              {/* Sign Up Button */}
+              <Link to="/signup">
+              <button
+                type="button"
+                className="w-full py-2 px-4 rounded-md border border-[#C4B07A] text-[#C4B07A] hover:bg-[#C4B07A] hover:text-white transition"
+              >
+                Create an Account
+              </button>
+            </Link>
+            </div>
+          </form>
+        </div>
+      </main>
+=======
           </form>
         </div>
       </main>
 
+>>>>>>> 5b74d2d0c692a4bf02b3f692dad7ac1291204c1d
       <Footer />
     </div>
   );
