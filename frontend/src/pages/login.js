@@ -1,14 +1,25 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (username === "admin" && password === "admin123") {
+      localStorage.setItem("isAdmin", "true");
+      navigate("/admin");
+    } else {
+      setError("Invalid admin login.")
+    }
+
     // Add your authentication logic here
     console.log("Logging in with:", username, password);
   };
@@ -31,12 +42,19 @@ function Login() {
             </p>
           </div>
 
+          {error && (
+            <div className="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Username / Career Account Field */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Purdue Career Account Alias
               </label>
+
               <div className="mt-1">
                 <input
                   id="username"
@@ -91,32 +109,29 @@ function Login() {
               </div>
             </div>
 
-            {/* Submit Button */}
+              {/* Submit Button */}
             <div className="space-y-3">
-  {/* Sign In Button */}
-  <button
-    type="submit"
-    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-[#C4B07A] hover:bg-yellow-700 transition"
-  >
-    Sign in
-  </button>
+              {/* Sign In Button */}
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-[#C4B07A] hover:bg-yellow-700 transition"
+              >
+                Sign in
+              </button>
 
-  {/* Sign Up Button */}
-  <Link to="/signup">
-  <button
-    type="button"
-    className="w-full py-2 px-4 rounded-md border border-[#C4B07A] text-[#C4B07A] hover:bg-[#C4B07A] hover:text-white transition"
-  >
-    Create an Account
-  </button>
-</Link>
-</div>
+              {/* Sign Up Button */}
+              <Link to="/signup">
+              <button
+                type="button"
+                className="w-full py-2 px-4 rounded-md border border-[#C4B07A] text-[#C4B07A] hover:bg-[#C4B07A] hover:text-white transition"
+              >
+                Create an Account
+              </button>
+            </Link>
+            </div>
           </form>
-
         </div>
       </main>
-
-      {/* Footer at the bottom */}
       <Footer />
     </div>
   );

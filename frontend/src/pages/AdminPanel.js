@@ -15,8 +15,8 @@ function AdminPanel() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const [projectForm, setProjectForm] = useState({ group_name: '', description: '' });
-    const [documentForm, setDocumentForm] = useState({ projectID: '', title: '', file_path: '' });
+    const [projectForm, setProjectForm] = useState({ group_name: '', description: '', date_created: ''});
+    const [documentForm, setDocumentForm] = useState({ projectID: '', title: '', file_path: '', created_at: ''});
     const [userForm, setUserForm] = useState({ email: '', display_name: '', password: '', role: 'admin' });
 
     const [editingProject, setEditingProject] = useState(null);
@@ -79,6 +79,7 @@ function AdminPanel() {
     const handleCreateProject = async (e) => {
         e.preventDefault();
         setLoading(true);
+
         try {
             const res = await fetch(`${API_URL}/api/projects`, {
                 method: 'POST',
@@ -86,20 +87,48 @@ function AdminPanel() {
                 body: JSON.stringify(projectForm)
             });
             if (!res.ok) throw new Error('Failed to create project');
+
             showMessage('Project created successfully');
             setProjectForm({ group_name: '', description: '' });
             fetchProjects();
         } catch (err) {
             showMessage(err.message, true);
         }
+
+        setLoading(false);
+    };
+
+    const handleUpdateProject = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const res = await fetch(`${API_URL}/api/projects/${editingProject}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(projectForm)
+            });
+
+            if (!res.ok) throw new Error('Failed to update project');
+
+            showMessage('Project updated successfully');
+            setEditingProject(null);
+            setProjectForm({ group_name: '', description: '', date_created: '' });
+            fetchProjects();
+        } catch (err) {
+            showMessage(err.message, true);
+        }
+
         setLoading(false);
     };
 
     const handleDeleteProject = async (id) => {
         if (!window.confirm('Are you sure you want to delete this project? This will also delete all associated documents.')) return;
+        
         try {
             const res = await fetch(`${API_URL}/api/projects/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete project');
+            
             showMessage('Project deleted successfully');
             fetchProjects();
             fetchDocuments();
@@ -108,27 +137,72 @@ function AdminPanel() {
         }
     };
 
+    const startEditProject = (project) => {
+        setEditingProject(project.projectID);
+        setProjectForm({
+            group_name: project.group_name || '',
+            description: project.description || '',
+            date_created: project.date_created
+                ? String(project.date_created).split('T')[0]
+                : ''
+        });
+    };
+
+    const cancelEditProject = () => {
+        setEditingProject(null);
+        setProjectForm({ group_name: '', description: '', date_created: '' });
+    };
+
     const handleCreateDocument = async (e) => {
         e.preventDefault();
         setLoading(true);
+        
         try {
             const res = await fetch(`${API_URL}/api/documents`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(documentForm)
             });
+            
             if (!res.ok) throw new Error('Failed to create document');
+            
             showMessage('Document created successfully');
-            setDocumentForm({ projectID: '', title: '', file_path: '' });
+            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: ''});
             fetchDocuments();
         } catch (err) {
             showMessage(err.message, true);
         }
+        
+        setLoading(false);
+    };
+
+    const handleUpdateDocument = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const res = await fetch(`${API_URL}/api/documents/${editingDocument}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(documentForm)
+            });
+
+            if (!res.ok) throw new Error('Failed to update document');
+
+            showMessage('Document updated successfully');
+            setEditingDocument(null);
+            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '' });
+            fetchDocuments();
+        } catch (err) {
+            showMessage(err.message, true);
+        }
+
         setLoading(false);
     };
 
     const handleDeleteDocument = async (id) => {
         if (!window.confirm('Are you sure you want to delete this document?')) return;
+        
         try {
             const res = await fetch(`${API_URL}/api/documents/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete document');
@@ -139,33 +213,54 @@ function AdminPanel() {
         }
     };
 
+    const startEditDocument = (doc) => {
+        setEditingDocument(doc.documentID);
+        setDocumentForm({
+            projectID: doc.projectID || '',
+            title: doc.title || '',
+            file_path: doc.file_path || '',
+            created_at: doc.created_at || ''
+        });
+    };
+
+    const cancelEditDocument = () => {
+        setEditingDocument(null);
+        setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '' });
+    };
+
     const handleCreateUser = async (e) => {
         e.preventDefault();
         setLoading(true);
+        
         try {
             const res = await fetch(`${API_URL}/api/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userForm)
             });
+
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || 'Failed to create user');
             }
+            
             showMessage('User created successfully');
             setUserForm({ email: '', display_name: '', password: '', role: 'admin' });
             fetchUsers();
         } catch (err) {
             showMessage(err.message, true);
         }
+
         setLoading(false);
     };
 
     const handleDeleteUser = async (id) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
+        
         try {
             const res = await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete user');
+            
             showMessage('User deleted successfully');
             fetchUsers();
         } catch (err) {
@@ -194,6 +289,7 @@ function AdminPanel() {
                         {error}
                     </div>
                 )}
+
                 {success && (
                     <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
                         {success}
@@ -225,8 +321,11 @@ function AdminPanel() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-lg font-semibold mb-4">Add New Project</h2>
-                                <form onSubmit={handleCreateProject} className="space-y-4">
+                                <h2 className="text-lg font-semibold mb-4">
+                                    {editingProject ? "Edit Project" : "Add New Project"}
+                                </h2>
+
+                                <form onSubmit={editingProject ? handleUpdateProject : handleCreateProject} className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Project Name *
@@ -252,13 +351,26 @@ function AdminPanel() {
                                             placeholder="Enter project description"
                                         />
                                     </div>
+
                                     <button
                                         type="submit"
                                         disabled={loading}
                                         className="w-full bg-[#C4B07A] text-white py-2 px-4 rounded-md font-medium hover:bg-yellow-700 transition disabled:opacity-50"
                                     >
-                                        {loading ? 'Creating...' : 'Create Project'}
+                                        {loading
+                                            ? (editingProject ? 'Updating...' : 'Creating...')
+                                            : (editingProject ? 'Update Project' : 'Create Project')}
                                     </button>
+
+                                    {editingProject && (
+                                        <button
+                                            type="button"
+                                            onClick={cancelEditProject}
+                                            className="w-full bg-gray-300 text-gray-800 py-2 px-4 rounded-md font-medium hover:bg-gray-400 transition"
+                                        >
+                                            Cancel Edit
+                                        </button>
+                                    )}
                                 </form>
                             </div>
                         </div>
@@ -279,12 +391,20 @@ function AdminPanel() {
                                                     <p className="text-sm text-gray-500 mt-1">{project.description || 'No description'}</p>
                                                     <p className="text-xs text-gray-400 mt-2">ID: {project.projectID}</p>
                                                 </div>
-                                                <button
-                                                    onClick={() => handleDeleteProject(project.projectID)}
-                                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                                >
-                                                    Delete
-                                                </button>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => startEditProject(project)}
+                                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteProject(project.projectID)}
+                                                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </div>
                                         ))
                                     )}
@@ -298,8 +418,10 @@ function AdminPanel() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-lg font-semibold mb-4">Add New Document</h2>
-                                <form onSubmit={handleCreateDocument} className="space-y-4">
+                                <h2 className="text-lg font-semibold mb-4">
+                                    {editingDocument ? 'Edit Document' : 'Add New Document'}
+                                </h2>
+                                <form onSubmit={editingDocument ? handleUpdateDocument : handleCreateDocument} className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Project *
@@ -318,6 +440,7 @@ function AdminPanel() {
                                             ))}
                                         </select>
                                     </div>
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Document Title *
@@ -331,6 +454,7 @@ function AdminPanel() {
                                             placeholder="Enter document title"
                                         />
                                     </div>
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             File Path *
@@ -350,8 +474,19 @@ function AdminPanel() {
                                         disabled={loading}
                                         className="w-full bg-[#C4B07A] text-white py-2 px-4 rounded-md font-medium hover:bg-yellow-700 transition disabled:opacity-50"
                                     >
-                                        {loading ? 'Creating...' : 'Create Document'}
+                                        {loading
+                                            ? (editingDocument ? 'Updating...' : 'Creating...')
+                                            : (editingDocument ? 'Update Document' : 'Create Document')}
                                     </button>
+                                    {editingDocument && (
+                                        <button
+                                            type="button"
+                                            onClick={cancelEditDocument}
+                                            className="w-full bg-gray-300 text-gray-800 py-2 px-4 rounded-md font-medium hover:bg-gray-400 transition"
+                                        >
+                                            Cancel Edit
+                                        </button>
+                                    )}
                                 </form>
                             </div>
                         </div>
@@ -373,6 +508,7 @@ function AdminPanel() {
                                                         Project: {projects.find(p => p.projectID === doc.projectID)?.group_name || `ID ${doc.projectID}`}
                                                     </p>
                                                     <p className="text-xs text-gray-400 mt-1">Path: {doc.file_path}</p>
+                                                    
                                                     {doc.file_url && (
                                                         <a 
                                                             href={doc.file_url} 
@@ -384,12 +520,21 @@ function AdminPanel() {
                                                         </a>
                                                     )}
                                                 </div>
-                                                <button
-                                                    onClick={() => handleDeleteDocument(doc.documentID)}
-                                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                                >
-                                                    Delete
-                                                </button>
+
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => startEditDocument(doc)}
+                                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteDocument(doc.documentID)}
+                                                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </div>
                                         ))
                                     )}

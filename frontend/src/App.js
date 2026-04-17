@@ -8,6 +8,7 @@ import Help from "./pages/Help";
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
 import AdminPanel from "./pages/AdminPanel";
+import AdminRoute from "./components/AdminRoute.js";
 
 
 function App() {
@@ -21,7 +22,8 @@ function App() {
       <Route path="/help" element={<Help />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/admin" element={<AdminPanel />} />
+      <Route path="/admin" element={<AdminRoute> <AdminPanel /> </AdminRoute>}/>
+
     </Routes>
   );
 }
