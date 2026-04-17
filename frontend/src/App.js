@@ -8,6 +8,7 @@ import Help from "./pages/Help";
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
 import AdminPanel from "./pages/AdminPanel";
+import AddProject from "./pages/AddProject";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/admin" element={<AdminPanel />} />
+       <Route path="/addproject" element={<AddProject />} />
     </Routes>
   );
 }
