@@ -6,9 +6,8 @@ import ProjectDetails from "./pages/ProjectDetails";
 import Faq from "./pages/FAQ";
 import Help from "./pages/Help";
 import Login from "./pages/login";
-import Projects from "./pages/Projects";
 import Signup from "./pages/Signup";
-
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
@@ -21,7 +20,9 @@ function App() {
       <Route path="/help" element={<Help />} />
       <Route path="/login" element={<Login />} />
       <Route path="/projects" element={<Projects />} />
-        <Route path="/signup" element={<Signup />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={<AdminPanel />} />
     </Routes>
   );
 }

@@ -171,7 +171,7 @@ app.post('/api/projects', async (req, res) => {
             });
         }
         const [result] = await db.query(
-            'INSERT INTO Projects (group_name, description, date_created) VALUES (?, ?, ?, ?)',
+            'INSERT INTO Projects (group_name, description, date_created) VALUES (?, ?, ?)',
             [group_name, description || null, date_created || null]
         );
         res.status(201).json({
@@ -275,6 +275,47 @@ app.delete('/api/users/:id', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+// ADMIN LOGIN
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const [rows] = await db.query(
+            'SELECT * FROM Users WHERE email = ? AND password = ?',
+            [email, password]
+        );
+
+        if (rows.length === 0) {
+            console.log("❌ Login failed for:", email);
+            return res.status(401).json({ error: 'Invalid login' });
+        }
+
+        const user = rows[0];
+
+        if (user.role !== 'admin') {
+            console.log("⛔ User is not admin:", email);
+            return res.status(403).json({ error: 'Not authorized' });
+        }
+
+        console.log("✅ Login successful:", email);
+
+        res.json({
+            message: 'Login successful',
+            user: {
+                userID: user.userID,
+                display_name: user.display_name,
+                role: user.role
+            }
+        });
+
+    } catch (err) {
+        console.error("LOGIN ERROR:", err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
 
 // SERVER - node index.js -- make sure you run within the folder, not the root
 const PORT = process.env.PORT || 3001;

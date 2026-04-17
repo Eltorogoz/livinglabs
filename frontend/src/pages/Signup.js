@@ -7,20 +7,53 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setError("");
+    setSuccess("");
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
-    console.log("Creating account:", {
-      username,
-      email,
-      password,
-    });
+    try {
+      const res = await fetch("http://localhost:3001/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          display_name: username,
+          password,
+          role: "admin" // or "student" if you want default users
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      setSuccess("Account created successfully!");
+      console.log("User created:", data);
+
+      // optional reset
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
   };
 
   return (
@@ -29,94 +62,74 @@ function Signup() {
       <Header />
 
       <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+        <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border">
 
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Create Account
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Join the Living Lab Purdue University
-            </p>
-          </div>
+          <h2 className="text-3xl font-bold text-center mb-6">
+            Create Account
+          </h2>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-
-            {/* Username */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-[#C4B07A] focus:border-[#C4B07A]"
-                placeholder="username"
-              />
+          {error && (
+            <div className="bg-red-100 text-red-700 p-2 mb-3 rounded">
+              {error}
             </div>
+          )}
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-[#C4B07A] focus:border-[#C4B07A]"
-                placeholder="email@example.com"
-              />
+          {success && (
+            <div className="bg-green-100 text-green-700 p-2 mb-3 rounded">
+              {success}
             </div>
+          )}
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-[#C4B07A] focus:border-[#C4B07A]"
-                placeholder="••••••••"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-[#C4B07A] focus:border-[#C4B07A]"
-                placeholder="••••••••"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
 
-            {/* Submit */}
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+
             <button
               type="submit"
-              className="w-full py-2 px-4 rounded-md text-white bg-[#C4B07A] hover:bg-yellow-700 transition"
+              className="w-full bg-[#C4B07A] text-white py-2 rounded hover:bg-yellow-700"
             >
               Create Account
             </button>
 
           </form>
-
         </div>
       </main>
 
       <Footer />
-
     </div>
   );
 }
