@@ -163,7 +163,7 @@ app.post('/api/users', async (req, res) => {
 // POST project (create new project)
 app.post('/api/projects', async (req, res) => {
     try {
-        const { group_name, description, date_created } = req.body;
+        let { group_name, description, date_created } = req.body;
 
         if (!group_name) {
             return res.status(400).json({
@@ -346,31 +346,37 @@ app.delete('/api/users/:id', async (req, res) => {
 // ADMIN LOGIN
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { display_name, password } = req.body;
+
+        if (!display_name || !password) {
+            return res.status(400).json({
+                error: "Display name and password are required."
+            });
+        }
 
         const [rows] = await db.query(
-            'SELECT * FROM Users WHERE email = ? AND password = ?',
-            [email, password]
+            'SELECT userID, email, display_name, password, role FROM Users WHERE display_name = ?',
+            [display_name]
         );
 
         if (rows.length === 0) {
-            console.log("❌ Login failed for:", email);
+            console.log("Login failed for:", display_name);
             return res.status(401).json({ error: 'Invalid login' });
         }
 
         const user = rows[0];
 
-        if (user.role !== 'admin') {
-            console.log("⛔ User is not admin:", email);
-            return res.status(403).json({ error: 'Not authorized' });
+        if (user.password !== password) {
+            return res.status(401).json({ error: 'Invalid Login' });
         }
 
-        console.log("✅ Login successful:", email);
+        console.log("✅ Login successful:", "username:", display_name," email:", user.email);
 
         res.json({
             message: 'Login successful',
             user: {
                 userID: user.userID,
+                email: user.email,
                 display_name: user.display_name,
                 role: user.role
             }
