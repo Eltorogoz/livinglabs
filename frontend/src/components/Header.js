@@ -13,6 +13,8 @@ function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsAdmin(false);
     navigate("/login");
   }

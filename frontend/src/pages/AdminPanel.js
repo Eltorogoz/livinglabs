@@ -16,12 +16,11 @@ function AdminPanel() {
     const [success, setSuccess] = useState('');
 
     const [projectForm, setProjectForm] = useState({ group_name: '', description: '', date_created: ''});
-    const [documentForm, setDocumentForm] = useState({ projectID: '', title: '', file_path: '', created_at: ''});
+    const [documentForm, setDocumentForm] = useState({ projectID: '', title: '', file_path: '', created_at: '', file: null});
     const [userForm, setUserForm] = useState({ email: '', display_name: '', password: '', role: 'admin' });
 
     const [editingProject, setEditingProject] = useState(null);
     const [editingDocument, setEditingDocument] = useState(null);
-    const [editingUser, setEditingUser] = useState(null);
 
     useEffect(() => {
         fetchProjects();
@@ -81,15 +80,25 @@ function AdminPanel() {
         setLoading(true);
 
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch(`${API_URL}/api/projects`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify(projectForm)
             });
-            if (!res.ok) throw new Error('Failed to create project');
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to create project'); 
+            }
 
             showMessage('Project created successfully');
-            setProjectForm({ group_name: '', description: '' });
+            setProjectForm({ group_name: '', description: '', date_created: '' });
             fetchProjects();
         } catch (err) {
             showMessage(err.message, true);
@@ -103,13 +112,22 @@ function AdminPanel() {
         setLoading(true);
 
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch(`${API_URL}/api/projects/${editingProject}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify(projectForm)
             });
 
-            if (!res.ok) throw new Error('Failed to update project');
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to update project');
+            }
 
             showMessage('Project updated successfully');
             setEditingProject(null);
@@ -126,8 +144,20 @@ function AdminPanel() {
         if (!window.confirm('Are you sure you want to delete this project? This will also delete all associated documents.')) return;
         
         try {
-            const res = await fetch(`${API_URL}/api/projects/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete project');
+            const token = localStorage.getItem("token");
+
+            const res = await fetch(`${API_URL}/api/projects/${id}`, { 
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                } 
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to delete project');
+            }
             
             showMessage('Project deleted successfully');
             fetchProjects();
@@ -158,16 +188,34 @@ function AdminPanel() {
         setLoading(true);
         
         try {
+            const token = localStorage.getItem("token");
+
+            if (!documentForm.file) {
+                throw new Error("Please choose a file to upload");
+            }
+
+            const formData = new FormData();
+            formData.append('projectID', documentForm.projectID);
+            formData.append('title', documentForm.title);
+            formData.append('created_at', documentForm.created_at || '');
+            formData.append('file', documentForm.file);
+
             const res = await fetch(`${API_URL}/api/documents`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(documentForm)
+                headers: { 
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
             });
+
+            const data = await res.json();
             
-            if (!res.ok) throw new Error('Failed to create document');
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to create document');
+            }
             
             showMessage('Document created successfully');
-            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: ''});
+            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '', file: null});
             fetchDocuments();
         } catch (err) {
             showMessage(err.message, true);
@@ -181,17 +229,35 @@ function AdminPanel() {
         setLoading(true);
 
         try {
+            const token = localStorage.getItem("token");
+
+            const formData = new FormData();
+            formData.append('projectID', documentForm.projectID);
+            formData.append('title', documentForm.title);
+            formData.append('created_at', documentForm.created_at || '');
+            formData.append('file_path', documentForm.file_path || '');
+
+            if (documentForm.file) {
+                formData.append('file', documentForm.file);
+            }
+
             const res = await fetch(`${API_URL}/api/documents/${editingDocument}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(documentForm)
+                headers: { 
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
             });
 
-            if (!res.ok) throw new Error('Failed to update document');
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to update document');
+            }
 
             showMessage('Document updated successfully');
             setEditingDocument(null);
-            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '' });
+            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '', file: null});
             fetchDocuments();
         } catch (err) {
             showMessage(err.message, true);
@@ -204,8 +270,20 @@ function AdminPanel() {
         if (!window.confirm('Are you sure you want to delete this document?')) return;
         
         try {
-            const res = await fetch(`${API_URL}/api/documents/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete document');
+            const token = localStorage.getItem("token");
+
+            const res = await fetch(`${API_URL}/api/documents/${id}`, { 
+                method: 'DELETE', 
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const data = await res.json();
+            
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to delete document');
+            }
             showMessage('Document deleted successfully');
             fetchDocuments();
         } catch (err) {
@@ -219,7 +297,10 @@ function AdminPanel() {
             projectID: doc.projectID || '',
             title: doc.title || '',
             file_path: doc.file_path || '',
-            created_at: doc.created_at || ''
+            created_at: doc.created_at
+                ? String(doc.created_at).split('T')[0]
+                : '',
+            file: null
         });
     };
 
@@ -233,9 +314,14 @@ function AdminPanel() {
         setLoading(true);
         
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch(`${API_URL}/api/users`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify(userForm)
             });
 
@@ -258,8 +344,17 @@ function AdminPanel() {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
         
         try {
-            const res = await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete user');
+            const token = localStorage.getItem("token");
+        
+            const res = await fetch(`${API_URL}/api/users/${id}`, { 
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!res.ok) {
+                throw new Error('Failed to delete user');
+            }
             
             showMessage('User deleted successfully');
             fetchUsers();
@@ -457,17 +552,17 @@ function AdminPanel() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            File Path *
+                                            Upload File {editingDocument ? '' : '*'}
                                         </label>
                                         <input
-                                            type="text"
+                                            type="file"
                                             required
-                                            value={documentForm.file_path}
-                                            onChange={(e) => setDocumentForm({...documentForm, file_path: e.target.value})}
+                                            onChange={(e) => setDocumentForm({...documentForm, file: e.target.files[0] || null})}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                            placeholder="/uploads/document.pdf"
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">Path relative to backend uploads folder</p>
+                                        {documentForm.file_path && (
+                                            <p className="text-xs text-gray-500 mt-1">Current File: {documentForm.file_path}</p>
+                                        )}
                                     </div>
                                     <button
                                         type="submit"

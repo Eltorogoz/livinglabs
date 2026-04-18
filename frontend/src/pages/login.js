@@ -31,6 +31,7 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         if (data.user.role === "admin") {
@@ -38,11 +39,13 @@ function Login() {
           navigate("/admin");
         } else {
           localStorage.removeItem("isAdmin");
+          localStorage.removeItem("token");
           localStorage.removeItem("user");
           setError("This account is not an Admin.");
         }
       } else {
         localStorage.removeItem("isAdmin");
+        localStorage.removeItem("token");
         localStorage.removeItem("user");
         setError(data.error || "Invalid login");
       }
