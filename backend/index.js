@@ -14,11 +14,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// temp disabling the login stuff... its not working well as of now
-// const authRoutes = require('./login');
-// app.use('/api/auth', authRoutes);
-
-
 // for getting the uploaded files publicly
 app.use('/uploads', express.static('uploads'));
 
@@ -69,11 +64,6 @@ app.get('/api/projects/:id/documents', async (req, res) => {
         const documents = rows.map(doc => ({
             ...doc,
             file_url: `${req.protocol}://${req.get('host')}${doc.file_path}`
-            // This constructs the full URL to access the file based on the server's address and the stored file path
-            // For example, if file_path is '/uploads/doc1.pdf' and the server is running on localhost:3001, the file_url will be 'http://localhost:3001/uploads/doc1.pdf'
-            // This allows the frontend to easily access the document files using the provided URLs without needing to know the internal file storage structure
-            
-            // this is just for when we eventually move everything to Render 
             }));
         res.json(documents);
     } catch (err) {
