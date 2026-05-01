@@ -102,7 +102,7 @@ app.get('/api/projects/:id', async (req, res) => {
 
 
 // GET all users (for testing)
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', requireAdmin, async (req, res) => {
     try {
         const [rows] = await db.query(
             'SELECT userID, email, display_name, role FROM Users'
@@ -254,6 +254,8 @@ app.post('/api/documents', requireAdmin, upload.single('file'), async (req, res)
             });
         }
 
+        console.log("✅", projectID, "Document title:", title, ", created successfully");
+
         const createdDate = created_at
             ? String(created_at).split('T')[0]
             : new Date().toISOString().slice(0, 10);
@@ -371,6 +373,8 @@ app.delete('/api/documents/:id', requireAdmin, async (req, res) => {
 
         res.json({ message: 'Document deleted successfully' });
 
+        console.log("Document ID:", documentID), "deleted successfully";
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });
@@ -385,6 +389,9 @@ app.delete('/api/projects/:id',requireAdmin,async (req, res) => {
         'DELETE FROM Projects WHERE projectID = ?',
         [projectID]
     );
+
+    console.log("Project ID:", projectID, "has been deleted...");
+
     if (result.affectedRows === 0) {
         return res.status(404).json({ error: 'Project not found' });
     }
