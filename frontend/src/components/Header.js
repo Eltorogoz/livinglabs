@@ -3,35 +3,50 @@ import { useState, useEffect } from "react";
 
 function Header() {
   const [showSearch, setShowSearch] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(localStorage.getItem("isAdmin") === "true");
+  const [user, setUser] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Load user on route change
   useEffect(() => {
-    setIsAdmin(localStorage.getItem("isAdmin") === "true");
-  },[location]);
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+
+      // Ensure normal users have a role
+      if (!parsed.role) {
+        parsed.role = "user";
+      }
+
+      setUser(parsed);
+    } else {
+      setUser(null);
+    }
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setIsAdmin(false);
+
+    setUser(null);
     navigate("/login");
-  }
+  };
 
   return (
     <>
       <header className="flex items-center justify-between px-8 py-4 border-b">
         <div className="flex items-center gap-4">
-          {/* Clickable logo */}
           <Link to="/">
-            <img 
-              src="/images/PurdueLogo.svg" 
-              alt="Purdue University" 
+            <img
+              src="/images/PurdueLogo.svg"
+              alt="Purdue University"
               className="h-12 hover:opacity-80 transition cursor-pointer"
             />
           </Link>
-          {/* Text NOT clickable */}
+
           <span className="text-lg font-medium">
             Living Lab Purdue University
           </span>
@@ -46,21 +61,16 @@ function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => setShowSearch(!showSearch)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
-          >
-            🔍
-          </button>
-          
-          {isAdmin ? (
+          {user ? (
             <>
-              <Link
-                to="/admin"
-                className="bg-[#C4B07A] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-700 transition"
-              >
-                Admin Panel
-              </Link>
+              {user.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="bg-[#C4B07A] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-700 transition"
+                >
+                  Admin Panel
+                </Link>
+              )}
 
               <button
                 onClick={handleLogout}
@@ -70,13 +80,13 @@ function Header() {
               </button>
             </>
           ) : (
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="bg-[#C4B07A] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-700 transition"
             >
               Log In
             </Link>
-            )}
+          )}
         </div>
       </header>
 

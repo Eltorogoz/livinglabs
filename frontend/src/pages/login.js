@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -28,30 +28,43 @@ function Login() {
         })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("Raw server response:", text);
+        throw new Error("Server did not return valid JSON");
+      }
 
       if (response.ok) {
+        // Ensure role exists
+        if (!data.user.role) {
+          data.user.role = "user";
+        }
+
+        // Save login info
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        if (data.user.role === "admin") {
-          localStorage.setItem("isAdmin", "true");
+        const isAdmin = data.user.role === "admin";
+        localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
+
+        // Redirect based on role
+        if (isAdmin) {
           navigate("/admin");
         } else {
-          localStorage.removeItem("isAdmin");
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setError("This account is not an Admin.");
+          navigate("/");
         }
+
       } else {
-        localStorage.removeItem("isAdmin");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
         setError(data.error || "Invalid login");
       }
+
     } catch (err) {
       console.error("Network error:", err);
-      setError("Server not reachable");
+      setError("Server not reachable or API misconfigured");
     }
   };
 
@@ -67,53 +80,42 @@ function Login() {
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Username */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Purdue Career Account Alias
+              <label className="block text-sm font-medium text-gray-700">
+                Username
               </label>
 
-              <div className="mt-1">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#C4B07A] focus:border-[#C4B07A] sm:text-sm"
-                  placeholder="username"
-                />
-              </div>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full border p-2 rounded mt-1"
+                placeholder="username"
+              />
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#C4B07A] focus:border-[#C4B07A] sm:text-sm"
-                  placeholder="••••••••"
-                />
-              </div>
+
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border p-2 rounded mt-1"
+                placeholder="••••••••"
+              />
             </div>
 
-            {/* Error */}
             {error && (
               <div className="p-3 bg-red-100 text-red-700 text-sm rounded">
                 {error}
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               className="w-full bg-[#C4B07A] text-white py-2 rounded hover:bg-yellow-700 transition"
@@ -121,7 +123,6 @@ function Login() {
               Sign In
             </button>
 
-            {/* Signup */}
             <Link to="/signup">
               <button
                 type="button"
@@ -133,7 +134,7 @@ function Login() {
           </form>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

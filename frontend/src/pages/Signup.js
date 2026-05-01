@@ -31,7 +31,6 @@ function Signup() {
           email,
           display_name: username,
           password,
-          role: "admin" // or "student" if you want default users
         }),
       });
 

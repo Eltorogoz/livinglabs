@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 function AdminPanel() {
     const [activeTab, setActiveTab] = useState('projects');
@@ -15,17 +15,20 @@ function AdminPanel() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const [projectForm, setProjectForm] = useState({ group_name: '', description: '', date_created: ''});
+    const [projectForm, setProjectForm] = useState({group_name: '',description: '',date_created: '',image: null});
     const [documentForm, setDocumentForm] = useState({ projectID: '', title: '', file_path: '', created_at: '', file: null});
     const [userForm, setUserForm] = useState({ email: '', display_name: '', password: '', role: 'admin' });
 
     const [editingProject, setEditingProject] = useState(null);
     const [editingDocument, setEditingDocument] = useState(null);
 
+    const [forms, setForms] = useState([]);
     useEffect(() => {
         fetchProjects();
         fetchDocuments();
         fetchUsers();
+        fetchForms();
+
     }, []);
 
     const showMessage = (msg, isError = false) => {
@@ -75,70 +78,52 @@ function AdminPanel() {
         }
     };
 
-    const handleCreateProject = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+const handleCreateProject = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-        try {
-            const token = localStorage.getItem("token");
+    try {
+        const token = localStorage.getItem("token");
 
-            const res = await fetch(`${API_URL}/api/projects`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(projectForm)
-            });
+        const formData = new FormData();
+        formData.append("group_name", projectForm.group_name);
+        formData.append("description", projectForm.description);
+        formData.append("date_created", projectForm.date_created || "");
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to create project'); 
-            }
-
-            showMessage('Project created successfully');
-            setProjectForm({ group_name: '', description: '', date_created: '' });
-            fetchProjects();
-        } catch (err) {
-            showMessage(err.message, true);
+        // 👇 image file
+        if (projectForm.image) {
+            formData.append("image", projectForm.image);
         }
 
-        setLoading(false);
-    };
+        const res = await fetch(`${API_URL}/api/projects`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: formData
+        });
 
-    const handleUpdateProject = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+        const data = await res.json();
 
-        try {
-            const token = localStorage.getItem("token");
-
-            const res = await fetch(`${API_URL}/api/projects/${editingProject}`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(projectForm)
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to update project');
-            }
-
-            showMessage('Project updated successfully');
-            setEditingProject(null);
-            setProjectForm({ group_name: '', description: '', date_created: '' });
-            fetchProjects();
-        } catch (err) {
-            showMessage(err.message, true);
+        if (!res.ok) {
+            throw new Error(data.error || "Failed to create project");
         }
 
-        setLoading(false);
-    };
+        showMessage("Project created successfully");
+        setProjectForm({
+            group_name: "",
+            description: "",
+            date_created: "",
+            image: null
+        });
+
+        fetchProjects();
+    } catch (err) {
+        showMessage(err.message, true);
+    }
+
+    setLoading(false);
+};
 
     const handleDeleteProject = async (id) => {
         if (!window.confirm('Are you sure you want to delete this project? This will also delete all associated documents.')) return;
@@ -169,18 +154,20 @@ function AdminPanel() {
 
     const startEditProject = (project) => {
         setEditingProject(project.projectID);
+
         setProjectForm({
             group_name: project.group_name || '',
             description: project.description || '',
             date_created: project.date_created
                 ? String(project.date_created).split('T')[0]
-                : ''
+                : '',
+            image: null  
         });
     };
 
     const cancelEditProject = () => {
         setEditingProject(null);
-        setProjectForm({ group_name: '', description: '', date_created: '' });
+        setProjectForm({ group_name: '', description: '', date_created: '', image: null });
     };
 
     const handleCreateDocument = async (e) => {
@@ -224,48 +211,53 @@ function AdminPanel() {
         setLoading(false);
     };
 
-    const handleUpdateDocument = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-        try {
-            const token = localStorage.getItem("token");
+    try {
+        const token = localStorage.getItem("token");
 
-            const formData = new FormData();
-            formData.append('projectID', documentForm.projectID);
-            formData.append('title', documentForm.title);
-            formData.append('created_at', documentForm.created_at || '');
-            formData.append('file_path', documentForm.file_path || '');
+        const formData = new FormData();
+        formData.append("group_name", projectForm.group_name);
+        formData.append("description", projectForm.description);
+        formData.append("date_created", projectForm.date_created || "");
 
-            if (documentForm.file) {
-                formData.append('file', documentForm.file);
-            }
-
-            const res = await fetch(`${API_URL}/api/documents/${editingDocument}`, {
-                method: 'PUT',
-                headers: { 
-                    Authorization: `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to update document');
-            }
-
-            showMessage('Document updated successfully');
-            setEditingDocument(null);
-            setDocumentForm({ projectID: '', title: '', file_path: '', created_at: '', file: null});
-            fetchDocuments();
-        } catch (err) {
-            showMessage(err.message, true);
+        if (projectForm.image) {
+            formData.append("image", projectForm.image);
         }
 
-        setLoading(false);
-    };
+        const res = await fetch(`${API_URL}/api/projects/${editingProject}`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: formData
+        });
 
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || "Failed to update project");
+        }
+
+        showMessage("Project updated successfully");
+        setEditingProject(null);
+
+        setProjectForm({
+            group_name: "",
+            description: "",
+            date_created: "",
+            image: null
+        });
+
+        fetchProjects();
+    } catch (err) {
+        showMessage(err.message, true);
+    }
+
+    setLoading(false);
+};
     const handleDeleteDocument = async (id) => {
         if (!window.confirm('Are you sure you want to delete this document?')) return;
         
@@ -366,8 +358,120 @@ function AdminPanel() {
     const tabs = [
         { id: 'projects', label: 'Projects', count: projects.length },
         { id: 'documents', label: 'Documents', count: documents.length },
-        { id: 'users', label: 'Users', count: users.length }
+        { id: 'users', label: 'Users', count: users.length },
+        { id: 'forms', label: 'Forms', count: forms.length }
     ];
+
+
+    const fetchForms = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/forms`);
+            const data = await res.json();
+
+            console.log("Forms response:", data);
+
+            if (Array.isArray(data)) {
+                setForms(data);
+            } else if (Array.isArray(data.forms)) {
+                setForms(data.forms);
+            } else {
+                console.error("Forms response was not an array:", data);
+                setForms([]);
+            }
+        } catch (err) {
+            console.error("Error fetching forms:", err);
+            setForms([]);
+        }
+    };
+
+   
+
+    const deleteForm = async (id) => {
+    try {
+        const res = await fetch(`${API_URL}/api/forms/${id}`, {
+            method: "DELETE",
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to delete form");
+        }
+
+        // remove from UI instantly
+        setForms(forms.filter((form) => form.id !== id));
+    } catch (err) {
+        console.error("Error deleting form:", err);
+    }
+};
+
+
+
+const handleUpdateDocument = async (e) => {
+    e.preventDefault();
+
+    try {
+        const res = await fetch(
+            `http://localhost:3001/api/documents/${editingDocument.documentID}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify(documentForm)
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || "Update failed");
+        }
+
+        // reset form
+        setEditingDocument(null);
+        setDocumentForm({
+            projectID: "",
+            title: "",
+            file_path: "",
+            created_at: ""
+        });
+
+        fetchDocuments(); // refresh list
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+};
+
+const handleToggleRole = async (userID, currentRole) => {
+  const newRole = currentRole === "admin" ? "user" : "admin";
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_URL}/api/users/${userID}/role`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ role: newRole })
+    });
+
+    if (!res.ok) throw new Error("Failed to update role");
+
+    setUsers(prev =>
+      prev.map(u =>
+        u.userID === userID ? { ...u, role: newRole } : u
+      )
+    );
+
+    showMessage("Role updated");
+  } catch (err) {
+    showMessage("Error updating role", true);
+  }
+};
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
@@ -446,6 +550,15 @@ function AdminPanel() {
                                             placeholder="Enter project description"
                                         />
                                     </div>
+                                    {/* IMAGE INPUT ADDED HERE */}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                                setProjectForm({ ...projectForm, image: e.target.files[0] })
+                                            }
+                                            className="w-full mb-3"
+                                        />
 
                                     <button
                                         type="submit"
@@ -639,106 +752,197 @@ function AdminPanel() {
                     </div>
                 )}
 
-                {activeTab === 'users' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1">
-                            <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-lg font-semibold mb-4">Add New User</h2>
-                                <form onSubmit={handleCreateUser} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Email *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            required
-                                            value={userForm.email}
-                                            onChange={(e) => setUserForm({...userForm, email: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                            placeholder="user@purdue.edu"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Display Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={userForm.display_name}
-                                            onChange={(e) => setUserForm({...userForm, display_name: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                            placeholder="John Doe"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Password *
-                                        </label>
-                                        <input
-                                            type="password"
-                                            required
-                                            value={userForm.password}
-                                            onChange={(e) => setUserForm({...userForm, password: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                            placeholder="Enter password"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Role
-                                        </label>
-                                        <select
-                                            value={userForm.role}
-                                            onChange={(e) => setUserForm({...userForm, role: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                        >
-                                            <option value="admin">Admin</option>
-                                        </select>
-                                    </div>
+{activeTab === 'users' && (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* ADD USER FORM */}
+        <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold mb-4">Add New User</h2>
+
+                <form onSubmit={handleCreateUser} className="space-y-4">
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email *
+                        </label>
+                        <input
+                            type="email"
+                            required
+                            value={userForm.email}
+                            onChange={(e) =>
+                                setUserForm({ ...userForm, email: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="user@purdue.edu"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Display Name *
+                        </label>
+                        <input
+                            type="text"
+                            required
+                            value={userForm.display_name}
+                            onChange={(e) =>
+                                setUserForm({ ...userForm, display_name: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="John Doe"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Password *
+                        </label>
+                        <input
+                            type="password"
+                            required
+                            value={userForm.password}
+                            onChange={(e) =>
+                                setUserForm({ ...userForm, password: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="Enter password"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Role
+                        </label>
+
+                        {/* optional: allow selecting role when creating */}
+                        <select
+                            value={userForm.role}
+                            onChange={(e) =>
+                                setUserForm({ ...userForm, role: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[#C4B07A] text-white py-2 px-4 rounded-md"
+                    >
+                        {loading ? "Creating..." : "Create User"}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {/* USERS LIST */}
+        <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+
+                <div className="px-6 py-4 border-b">
+                    <h2 className="text-lg font-semibold">All Users</h2>
+                </div>
+
+                <div className="divide-y">
+
+                    {users.length === 0 ? (
+                        <p className="p-6 text-gray-500 text-center">
+                            No users found
+                        </p>
+                    ) : (
+                        users.map((user) => (
+                            <div
+                                key={user.userID}
+                                className="p-6 flex items-start justify-between"
+                            >
+                                <div>
+                                    <h3 className="font-medium">
+                                        {user.display_name}
+                                    </h3>
+
+                                    <p className="text-sm text-gray-500">
+                                        {user.email}
+                                    </p>
+
+                                    <span className="inline-block mt-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
+                                        {user.role}
+                                    </span>
+                                </div>
+
+                                <div className="flex gap-4 items-center">
+
+                                    {/* TOGGLE ROLE BUTTON */}
                                     <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full bg-[#C4B07A] text-white py-2 px-4 rounded-md font-medium hover:bg-yellow-700 transition disabled:opacity-50"
+                                        onClick={() =>
+                                            handleToggleRole(
+                                                user.userID,
+                                                user.role
+                                            )
+                                        }
+                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                     >
-                                        {loading ? 'Creating...' : 'Create User'}
+                                        Make{" "}
+                                        {user.role === "admin"
+                                            ? "User"
+                                            : "Admin"}
                                     </button>
-                                </form>
+
+                                    {/* DELETE */}
+                                    <button
+                                        onClick={() =>
+                                            handleDeleteUser(user.userID)
+                                        }
+                                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
+                        ))
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+
+
+                {activeTab === 'forms' && (
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold">Submitted Forms</h2>
+        </div>
+
+        <div className="divide-y divide-gray-200">
+            {forms.length === 0 ? (
+                <p className="p-6 text-gray-500 text-center">No forms found</p>
+            ) : (
+                forms.map(form => (
+                    <div key={form.id} className="p-6 flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{form.name}</h3>
+                            <p className="text-sm text-gray-500 mt-1">{form.email}</p>
+                            <p className="text-sm text-gray-600 mt-2">{form.message}</p>
                         </div>
 
-                        <div className="lg:col-span-2">
-                            <div className="bg-white rounded-lg shadow overflow-hidden">
-                                <div className="px-6 py-4 border-b border-gray-200">
-                                    <h2 className="text-lg font-semibold">All Users</h2>
-                                </div>
-                                <div className="divide-y divide-gray-200">
-                                    {users.length === 0 ? (
-                                        <p className="p-6 text-gray-500 text-center">No users found</p>
-                                    ) : (
-                                        users.map(user => (
-                                            <div key={user.userID} className="p-6 flex items-start justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <h3 className="font-medium text-gray-900">{user.display_name}</h3>
-                                                    <p className="text-sm text-gray-500 mt-1">{user.email}</p>
-                                                    <span className="inline-block mt-2 px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">
-                                                        {user.role}
-                                                    </span>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleDeleteUser(user.userID)}
-                                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <button
+                            onClick={() => deleteForm(form.id)}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                            Delete
+                        </button>
                     </div>
-                )}
+                ))
+            )}
+        </div>
+    </div>
+)}
+
+                
             </main>
 
             <Footer />

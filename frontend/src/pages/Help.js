@@ -7,9 +7,9 @@ function Help() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const BACKEND_URL = "http://localhost:3001";
   const slides = [
-    { id: 1, src: "https://www.purdue.edu/polytechnic/livlab/wp-content/uploads/2024/10/Britney-Ho_JU17051.jpg", alt: "Student working at desk" },
-    { id: 2, src: "https://www.purdue.edu/polytechnic/livlab/wp-content/uploads/2024/10/2024_GMB5751.jpg", alt: "Students collaborating" },
-    { id: 3, src: "https://www.purdue.edu/home/wp-content/uploads/2024/04/About-ExploreWL-PMU-1920x960-1.jpg", alt: "Living lab presentation" }
+    { id: 1, src: "/images/help-slide-1.jpg", alt: "Student working at desk" },
+    { id: 2, src: "/images/help-slide-2.jpg", alt: "Students collaborating" },
+    { id: 3, src: "/images/help-slide-3.jpg", alt: "Living lab presentation" }
   ];
 
   useEffect(() => {
